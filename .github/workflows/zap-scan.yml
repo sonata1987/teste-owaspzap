@@ -7,6 +7,14 @@ on:
         required: true
         type: string
         description: 'A URL do site/aplicação que será testada'
+  
+  # Adicionamos isso aqui para você conseguir rodar direto dele para testar!
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'URL para testar manualmente'
+        required: true
+        default: 'https://www.zaproxy.org'
 
 jobs:
   zap_scan:
@@ -20,13 +28,11 @@ jobs:
         uses: zaproxy/action-baseline@v0.13.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: ${{ inputs.target_url }}
+          target: ${{ github.event.inputs.target_url || inputs.target_url }}
           rules_file_name: '.zap/rules.tsv'
           fail_action: false
-          # IMPORTANTE: Desativamos o upload padrão que causou o bug
           artifact_name: '' 
 
-      # Fazemos o upload do relatório manualmente usando a action oficial e atualizada
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
