@@ -15,7 +15,10 @@ on:
         description: 'URL para testar manualmente'
         required: true
         default: 'https://www.zaproxy.org'
-
+        
+  push:
+    paths:
+      - '.github/workflows/zap-scan.yml'
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
