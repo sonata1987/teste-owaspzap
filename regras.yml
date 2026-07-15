@@ -1,0 +1,6 @@
+rules:
+  - id: python-injection-system
+    pattern: os.system(...)
+    message: "PERIGO: Detectado uso de os.system! Isso é vulnerável a Injeção de Comando."
+    languages: [python]
+    severity: ERROR
