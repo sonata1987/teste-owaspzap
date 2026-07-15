@@ -8,17 +8,17 @@ on:
         type: string
         description: 'A URL do site/aplicação que será testada'
   
-  # Adicionamos isso aqui para você conseguir rodar direto dele para testar!
   workflow_dispatch:
     inputs:
       target_url:
         description: 'URL para testar manualmente'
         required: true
         default: 'https://www.zaproxy.org'
-        
+
   push:
     paths:
       - '.github/workflows/zap-scan.yml'
+
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
@@ -27,11 +27,29 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Criamos a pasta .zap e um arquivo de regras vazio caso ele não exista,
+      # evitando o erro de "rules file not found" que apareceu no seu log.
+      - name: Create default rules directory if missing
+        run: |
+          mkdir -p .zap
+          touch .zap/rules.tsv
+
       - name: OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.13.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: ${{ github.event.inputs.target_url || inputs.target_url }}
+          target: ${{ github.event.inputs.target_url || inputs.target_url || 'https://www.zaproxy.org' }}
           rules_file_name: '.zap/rules.tsv'
           fail_action: false
-          artifact_name: 'zap_scan_results' 
+          # IMPORTANTE: Desativamos o upload nativo problemático definindo o nome como vazio
+          artifact_name: '' 
+
+      # Fazemos o upload de forma manual e segura usando a action oficial atualizada do GitHub
+      - name: Upload ZAP Scan Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-scan-results
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
