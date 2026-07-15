@@ -14,12 +14,16 @@ jobs:
       - name: Run Semgrep Scan
         run: |
           pip install semgrep
-          # Passamos a regra diretamente em formato de texto inline!
-          semgrep --config inline: '
-            rules:
-              - id: python-injection-system
-                pattern: os.system(...)
-                message: "PERIGO: Detectado uso de os.system! Isso é vulnerável a Injeção de Comando."
-                languages: [python]
-                severity: ERROR
-          ' .
+          
+          # 1. Cria o arquivo de regras localmente usando o terminal
+          cat << 'EOF' > regras-locais.yml
+          rules:
+            - id: python-injection-system
+              pattern: os.system(...)
+              message: "PERIGO: Detectado uso de os.system! Isso e vulneravel a Injecao de Comando."
+              languages: [python]
+              severity: ERROR
+          EOF
+
+          # 2. Roda o Semgrep apontando para o arquivo que acabamos de criar
+          semgrep --config regras-locais.yml .
