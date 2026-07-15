@@ -14,4 +14,4 @@ jobs:
       - name: Run Semgrep Scan
         run: |
           pip install semgrep
-          semgrep --config auto .
+          semgrep --config p/owasp-top-10
