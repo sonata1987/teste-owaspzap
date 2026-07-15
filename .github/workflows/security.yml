@@ -14,23 +14,6 @@ jobs:
       - name: Run Semgrep Scan
         run: |
           pip install semgrep
-          semgrep --config p/default --config p/security-audit .
-name: Reusable Semgrep Scan
-
-on:
-  workflow_call:
-
-jobs:
-  semgrep_scan:
-    name: Security Scan (Semgrep)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Semgrep Scan
-        run: |
-          pip install semgrep
           # Passamos a regra diretamente em formato de texto inline!
           semgrep --config inline: '
             rules:
