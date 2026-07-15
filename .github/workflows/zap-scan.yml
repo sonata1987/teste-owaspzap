@@ -34,17 +34,15 @@ jobs:
           mkdir -p .zap
           touch .zap/rules.tsv
 
-      - name: OWASP ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.13.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target: ${{ github.event.inputs.target_url || inputs.target_url || 'https://www.zaproxy.org' }}
-          rules_file_name: '.zap/rules.tsv'
-          fail_action: false
-          # IMPORTANTE: Desativamos o upload nativo problemático definindo o nome como vazio
-          artifact_name: '' 
-
-      # Fazemos o upload de forma manual e segura usando a action oficial atualizada do GitHub
+      - name: Run ZAP Baseline Scan via Docker
+        run: |
+         docker run --user root -v ${{ github.workspace }}:/zap/wrk/:rw --network=host -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+          -t ${{ github.event.inputs.target_url || inputs.target_url || 'https://www.zaproxy.org' }} \
+          -c .zap/rules.tsv \
+          -J report_json.json \
+          -w report_md.md \
+          -r report_html.html || true
+  
       - name: Upload ZAP Scan Artifacts
         uses: actions/upload-artifact@v4
         with:
