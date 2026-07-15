@@ -1,18 +1,16 @@
 name: Reusable Semgrep Scan
 
 on:
-  workflow_call: # Diz ao GitHub que este workflow pode ser chamado por outros repositórios
+  workflow_call:
 
 jobs:
   semgrep_scan:
     name: Security Scan (Semgrep)
     runs-on: ubuntu-latest
     steps:
-      # 1. Baixa o código do repositório QUE CHAMOU o workflow (o novo repo)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Roda a análise no código desse repositório
       - name: Run Semgrep Scan
         run: |
           pip install semgrep
