@@ -15,15 +15,17 @@ jobs:
         run: |
           pip install semgrep
           
-          # 1. Cria o arquivo de regras localmente usando o terminal
-          cat << 'EOF' > regras-locais.yml
-          rules:
-            - id: python-injection-system
-              pattern: os.system(...)
-              message: "PERIGO: Detectado uso de os.system! Isso e vulneravel a Injecao de Comando."
-              languages: [python]
-              severity: ERROR
-          EOF
+          # 1. Cria a pasta para organizar as regras
+          mkdir -p regras
+          
+          # 2. Baixa pacotes de regras oficiais de segurança para Python diretamente do GitHub
+          # Regras contra injeção de código e comandos (como o os.system)
+          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/injection/sys-path-vulnerability.yml -o regras/sys-path.yml
+          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/injection/taint-command-injection.yml -o regras/command-injection.yml
+          
+          # Regras contra uso de criptografia fraca ou funções obsoletas
+          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/eval.yml -o regras/eval.yml
+          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/deserialization/avoid-shelve.yml -o regras/shelve.yml
 
-          # 2. Roda o Semgrep apontando para o arquivo que acabamos de criar
-          semgrep --config regras-locais.yml .
+          # 3. Roda o Semgrep usando a pasta 'regras' inteira e força a quebra com o '--error'
+          semgrep --config regras/ --error .
