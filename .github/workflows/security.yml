@@ -18,14 +18,9 @@ jobs:
 
       - name: Run Semgrep Scan
         run: |
-          # Criamos a pasta para as regras
-          mkdir -p regras
+          # 1. Instala o Semgrep permitindo pacotes do sistema
+          pip install semgrep --break-system-packages
           
-          # Baixamos as regras (caso você realmente precise dessas regras específicas localmente)
-          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/injection/sys-path-vulnerability.yml -o regras/sys-path.yml
-          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/injection/taint-command-injection.yml -o regras/command-injection.yml
-          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/eval.yml -o regras/eval.yml
-          curl -sS https://raw.githubusercontent.com/semgrep/semgrep-rules/develop/python/security/deserialization/avoid-shelve.yml -o regras/shelve.yml
-
-          # Execução corrigida (sem a flag inválida --error)
-          semgrep --config regras/ .
+          # 2. Executa usando os pacotes oficiais diretamente (sem precisar de curl)
+          # Isso puxa as regras de segurança oficiais de Python diretamente da nuvem deles
+          semgrep --config p/python --config p/security .
